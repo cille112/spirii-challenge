@@ -36,3 +36,7 @@ I didn't have time to write test for everything, picked DB and anomaly check as 
 
 ## 30% consumer
 I know the way I calculate this is not entirely correct since I just add consumptions until I reach 30% or more, but due to time limitations I decided to go with this approach. 
+
+## Forecast
+I din't have time to finnish this, I started my idea was to calculate the total in 10 minutes pr consumer and then getting the average of this and multiply it by 10.
+This would not give a super accurate forecast but it would give an idea. 
