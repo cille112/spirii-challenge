@@ -40,6 +40,10 @@ func main() {
 		router.ThirthyPercentHandler(c.Writer, c.Request, db)
 	})
 
+	// r.GET("/forecast", router.BasicAuth(), func(c *gin.Context) {
+	// 	router.ForecastHandler(c.Writer, c.Request, db)
+	// })
+
 	log.Fatal(r.Run(":8000"))
 
 }

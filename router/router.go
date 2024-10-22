@@ -115,6 +115,37 @@ func ThirthyPercentHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	json.NewEncoder(w).Encode(data)
 }
 
+// func ForecastHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+// 	w.Header().Set("Content-Type", "application/json")
+
+// 	min := r.URL.Query().Get("minutes")
+// 	if min == "" {
+// 		min = "10"
+// 	}
+
+// 	print(min)
+
+// 	tc, err := getTop30Consumer(db)
+// 	if err != nil {
+// 		http.Error(w, "Unable to fetch consumer data", http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	num, err := strconv.Atoi(min)
+// 	if err != nil {
+// 		fmt.Println("Error converting string to int:", err)
+// 		return
+// 	}
+
+// 	data, err := forecastConsumption(db, tc.Consumers, int(num))
+// 	if err != nil {
+// 		http.Error(w, "Unable to forecast", http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	json.NewEncoder(w).Encode(data)
+// }
+
 func getTop30Consumer(db *sql.DB) (models.TopThirtyConsumer, error) {
 	var resp models.TopThirtyConsumer
 
@@ -151,3 +182,20 @@ func getTop30Consumer(db *sql.DB) (models.TopThirtyConsumer, error) {
 
 	return resp, nil
 }
+
+// func forecastConsumption(db *sql.DB, topConsumers []models.TopConsumer, period int) (map[string]float64, error) {
+// 	forecasts := make(map[string]float64)
+
+// 	for _, consumerID := range topConsumers {
+// 		query := `SELECT AVG(meterReading) FROM data WHERE consumerId = ? AND Timestamp >= datetime('now', '-? minutes')`
+// 		var average float64
+// 		err := db.QueryRow(query, consumerID.ConsumerID, period).Scan(&average)
+// 		if err != nil {
+// 			print(err.Error())
+// 			return nil, err
+// 		}
+// 		forecasts[consumerID.ConsumerID] = average * float64(period)
+// 	}
+
+// 	return forecasts, nil
+// }
