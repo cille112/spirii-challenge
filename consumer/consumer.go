@@ -23,5 +23,5 @@ func ConsumeStream(dataStream chan models.Data, db *sql.DB) {
 }
 
 func checkForAnomalies(data models.Data) bool {
-	return data.MeterReading < 0
+	return data.MeterReading < 0 && data.MeterID == ""
 }

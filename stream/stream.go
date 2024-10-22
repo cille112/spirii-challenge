@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var meterIdList = []string{"sensor-1", "sensor-2", "sensor-3", "sensor-4", "sensor-5"}
+var meterIdList = []string{"sensor-1", "sensor-2", "sensor-3", "sensor-4", "sensor-5", ""}
 var consumerIdList = []string{"consumer-1", "consumer-2", "consumer-3", "consumer-4", "consumer-5"}
 
 func SimulateStream(dataStream chan models.Data) {
