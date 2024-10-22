@@ -32,7 +32,8 @@ I decided to go with sqlite because it doesn't require a lot of setup. There is 
 ## Test
 To run the test `go test -v ./...`
 
-I didn't have time to write test for everything, picked DB and anomaly check as two important steps
+I didn't have time to write test for everything, picked DB and anomaly check as two important steps. 
+I wold have likes to test my api as well, using the `net/http/httptest`to crate mock requests and also using a mock DB to make sure I know what the api should return. 
 
 ## 30% consumer
 I know the way I calculate this is not entirely correct since I just add consumptions until I reach 30% or more, but due to time limitations I decided to go with this approach. 
