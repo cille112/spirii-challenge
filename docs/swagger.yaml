@@ -15,6 +15,24 @@ definitions:
         description: timestamp of data
         type: string
     type: object
+  models.TopConsumer:
+    description: TopConsumer structure for API
+    properties:
+      consumerId:
+        type: string
+      totalReading:
+        type: integer
+    type: object
+  models.TopThirtyConsumer:
+    description: TopThirtyConsumer structure for API
+    properties:
+      consumers:
+        items:
+          $ref: '#/definitions/models.TopConsumer'
+        type: array
+      totalConsumption:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
@@ -32,4 +50,32 @@ paths:
               $ref: '#/definitions/models.Data'
             type: array
       summary: Get data
+  /thirtyconsumer:
+    get:
+      description: Get a list of consumers and their usage that is almost 30% of total
+      operationId: get-tirthy-consumer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TopThirtyConsumer'
+            type: array
+      summary: Get consumers that adds up to around 30% to total consumption
+  /topconsumer:
+    get:
+      description: Get a list of consumers and their usage for the last 10 minutes
+      operationId: get-top-consumer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TopConsumer'
+            type: array
+      summary: Get top consumers
 swagger: "2.0"

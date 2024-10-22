@@ -35,6 +35,48 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/thirtyconsumer": {
+            "get": {
+                "description": "Get a list of consumers and their usage that is almost 30% of total",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get consumers that adds up to around 30% to total consumption",
+                "operationId": "get-tirthy-consumer",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TopThirtyConsumer"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/topconsumer": {
+            "get": {
+                "description": "Get a list of consumers and their usage for the last 10 minutes",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get top consumers",
+                "operationId": "get-top-consumer",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TopConsumer"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -57,6 +99,33 @@ const docTemplate = `{
                 "timestamp": {
                     "description": "timestamp of data",
                     "type": "string"
+                }
+            }
+        },
+        "models.TopConsumer": {
+            "description": "TopConsumer structure for API",
+            "type": "object",
+            "properties": {
+                "consumerId": {
+                    "type": "string"
+                },
+                "totalReading": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.TopThirtyConsumer": {
+            "description": "TopThirtyConsumer structure for API",
+            "type": "object",
+            "properties": {
+                "consumers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.TopConsumer"
+                    }
+                },
+                "totalConsumption": {
+                    "type": "integer"
                 }
             }
         }

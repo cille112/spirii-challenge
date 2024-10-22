@@ -86,7 +86,7 @@ func SensorDataHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 func TopConsumerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	w.Header().Set("Content-Type", "application/json")
 
-	data, err := getTopConsumers(db)
+	data, err := getTopConsumers(db, time.Now().Add(-10*time.Minute).Format(time.RFC3339))
 	if err != nil {
 		print(err.Error())
 		http.Error(w, "Unable to fetch consumer data", http.StatusInternalServerError)
@@ -101,7 +101,7 @@ func TopConsumerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 // @ID get-tirthy-consumer
 // @Produce json
 // @Success 200 {array} models.TopThirtyConsumer
-// @Router /topconsumer [get]
+// @Router /thirtyconsumer [get]
 func ThirthyPercentHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -129,12 +129,11 @@ func getSensorData(db *sql.DB) ([]models.Data, error) {
 		}
 		sensorData = append(sensorData, data)
 	}
+	print(len(sensorData))
 	return sensorData, nil
 }
 
-func getTopConsumers(db *sql.DB) ([]models.TopConsumer, error) {
-	tenMinutesAgo := time.Now().Add(-10 * time.Minute)
-
+func getTopConsumers(db *sql.DB, timeLimit string) ([]models.TopConsumer, error) {
 	query := `
         SELECT consumerId, SUM(meterReading) AS totalReading
         FROM data
@@ -143,7 +142,7 @@ func getTopConsumers(db *sql.DB) ([]models.TopConsumer, error) {
         ORDER BY totalReading DESC`
 
 	// Prepare the statement
-	rows, err := db.Query(query, tenMinutesAgo)
+	rows, err := db.Query(query, timeLimit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query top consumers: %w", err)
 	}
@@ -181,7 +180,7 @@ func getTop30Consumer(db *sql.DB) (models.TopThirtyConsumer, error) {
 
 	thirtyPercent := float64(int(totalConsumption.Int64)) * 0.3
 
-	tc, err := getTopConsumers(db)
+	tc, err := getTopConsumers(db, time.Time{}.Format(time.RFC3339))
 	if err != nil {
 		return resp, fmt.Errorf("failed to get consumption pr consumer: %w", err)
 	}
