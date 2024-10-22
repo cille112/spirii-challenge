@@ -1,0 +1,35 @@
+definitions:
+  models.Data:
+    description: Data structure for API
+    properties:
+      consumerId:
+        description: id of consumer
+        type: string
+      meterId:
+        description: id of meter
+        type: string
+      meterReading:
+        description: the reading from the meter
+        type: integer
+      timestamp:
+        description: timestamp of data
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /data:
+    get:
+      description: Get a list of data
+      operationId: get-data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Data'
+            type: array
+      summary: Get data
+swagger: "2.0"

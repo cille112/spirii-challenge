@@ -1,0 +1,53 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/data": {
+            "get": {
+                "description": "Get a list of data",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get data",
+                "operationId": "get-data",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Data"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Data": {
+            "description": "Data structure for API",
+            "type": "object",
+            "properties": {
+                "consumerId": {
+                    "description": "id of consumer",
+                    "type": "string"
+                },
+                "meterId": {
+                    "description": "id of meter",
+                    "type": "string"
+                },
+                "meterReading": {
+                    "description": "the reading from the meter",
+                    "type": "integer"
+                },
+                "timestamp": {
+                    "description": "timestamp of data",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
