@@ -1,6 +1,7 @@
 package router
 
 import (
+	database "code-challenge/db"
 	"code-challenge/models"
 	"database/sql"
 	"encoding/base64"
@@ -68,7 +69,7 @@ func BasicAuth() gin.HandlerFunc {
 func SensorDataHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	w.Header().Set("Content-Type", "application/json")
 
-	data, err := getSensorData(db)
+	data, err := database.GetData(db)
 	if err != nil {
 		http.Error(w, "Unable to fetch sensor data", http.StatusInternalServerError)
 		return
@@ -86,7 +87,7 @@ func SensorDataHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 func TopConsumerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	w.Header().Set("Content-Type", "application/json")
 
-	data, err := getTopConsumers(db, time.Now().Add(-10*time.Minute).Format(time.RFC3339))
+	data, err := database.GetTopConsumers(db, time.Now().Add(-10*time.Minute).Format(time.RFC3339))
 	if err != nil {
 		print(err.Error())
 		http.Error(w, "Unable to fetch consumer data", http.StatusInternalServerError)
@@ -114,73 +115,17 @@ func ThirthyPercentHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	json.NewEncoder(w).Encode(data)
 }
 
-func getSensorData(db *sql.DB) ([]models.Data, error) {
-	rows, err := db.Query("SELECT meterId, timestamp, consumerId, meterReading FROM data")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var sensorData []models.Data
-	for rows.Next() {
-		var data models.Data
-		if err := rows.Scan(&data.MeterID, &data.Timestamp, &data.ConsumerID, &data.MeterReading); err != nil {
-			return nil, err
-		}
-		sensorData = append(sensorData, data)
-	}
-	print(len(sensorData))
-	return sensorData, nil
-}
-
-func getTopConsumers(db *sql.DB, timeLimit string) ([]models.TopConsumer, error) {
-	query := `
-        SELECT consumerId, SUM(meterReading) AS totalReading
-        FROM data
-		WHERE timestamp >= ?
-        GROUP BY consumerId
-        ORDER BY totalReading DESC`
-
-	// Prepare the statement
-	rows, err := db.Query(query, timeLimit)
-	if err != nil {
-		return nil, fmt.Errorf("failed to query top consumers: %w", err)
-	}
-	defer rows.Close()
-
-	// Slice to hold the results
-	var topConsumers []models.TopConsumer
-
-	// Iterate through the results
-	for rows.Next() {
-		var consumer models.TopConsumer
-		if err := rows.Scan(&consumer.ConsumerID, &consumer.TotalReading); err != nil {
-			return nil, fmt.Errorf("failed to scan row: %w", err)
-		}
-		topConsumers = append(topConsumers, consumer)
-	}
-
-	// Check for errors from iterating over rows
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error while iterating rows: %w", err)
-	}
-
-	return topConsumers, nil
-}
-
 func getTop30Consumer(db *sql.DB) (models.TopThirtyConsumer, error) {
 	var resp models.TopThirtyConsumer
-	query := `SELECT SUM(meterReading) FROM data`
 
-	var totalConsumption sql.NullInt64
-	err := db.QueryRow(query).Scan(&totalConsumption)
+	totalConsumption, err := database.GetTotalConsumption(db)
 	if err != nil {
-		return resp, fmt.Errorf("failed to calculate total consumption: %w", err)
+		return resp, fmt.Errorf("failed to get total consumption: %w", err)
 	}
 
-	thirtyPercent := float64(int(totalConsumption.Int64)) * 0.3
+	thirtyPercent := float64(totalConsumption) * 0.3
 
-	tc, err := getTopConsumers(db, time.Time{}.Format(time.RFC3339))
+	tc, err := database.GetTopConsumers(db, time.Time{}.Format(time.RFC3339))
 	if err != nil {
 		return resp, fmt.Errorf("failed to get consumption pr consumer: %w", err)
 	}
@@ -202,7 +147,7 @@ func getTop30Consumer(db *sql.DB) (models.TopThirtyConsumer, error) {
 	}
 
 	resp.Consumers = selectedConsumers
-	resp.TotalConsumption = int(totalConsumption.Int64)
+	resp.TotalConsumption = totalConsumption
 
 	return resp, nil
 }
